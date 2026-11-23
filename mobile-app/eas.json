@@ -4,11 +4,11 @@
     "preview": {
       "distribution": "internal",
       "android": { "buildType": "apk" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://YOUR-APP-NAME.onrender.com" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://slidebox.onrender.com" }
     },
     "production": {
       "android": { "buildType": "app-bundle" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://YOUR-APP-NAME.onrender.com" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://slidebox.onrender.com" }
     }
   }
 }
