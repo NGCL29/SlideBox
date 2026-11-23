@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SlideBox • Luxury Presentation & LMS Storage</title>
+  
+  <!-- Web App Manifest & Mobile Web Capable -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SlideBox">
+  <meta name="theme-color" content="#0a0a0a">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              200: '#fde68a',
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#d4af37', // Classic metallic gold
+              600: '#b89628',
+              700: '#92751f',
+              800: '#735b1c',
+              900: '#45350f'
+            },
+            obsidian: {
+              950: '#050505',
+              900: '#0a0a0a',
+              850: '#111111',
+              800: '#171717',
+              750: '#202020',
+              700: '#2a2a2a'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Premium Black & Gold Aesthetics */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea, [contenteditable="true"] {
+      user-select: text;
+    }
+
+    /* Metallic Gold Shimmer & Gradients */
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fce08a 0%, #d4af37 50%, #aa771c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gold-gradient-bg {
+      background: linear-gradient(135deg, #e5c07b 0%, #d4af37 50%, #aa771c 100%);
+    }
+    .gold-gradient-card {
+      background: linear-gradient(145deg, #18181b 0%, #0d0d0e 100%);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+    }
+    .gold-glow {
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.18);
+    }
+
+    /* Glassmorphic Nav in Black & Gold */
+    .glass-nav {
+      background: rgba(10, 10, 10, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(212, 175, 55, 0.18);
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Custom Mobile Phone Frame with Gold-accented bezel */
+    .phone-container {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .phone-mockup {
+      width: 412px;
+      height: 860px;
+      border-radius: 50px;
+      background: #080808;
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.9), 0 0 0 10px #171717, 0 0 0 12px rgba(212, 175, 55, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .phone-notch {
+      width: 124px;
+      height: 28px;
+      background: #000;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border: 1px solid #1f1f1f;
+    }
+    .camera-lens {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #090909;
+      border: 1px solid #332d16;
+    }
+    .speaker-slot {
+      width: 40px;
+      height: 4px;
+      background: #1c1c1c;
+      border-radius: 2px;
+    }
+
+    /* Fullscreen Mode Override */
+    .mode-full .phone-mockup {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    .mode-full .phone-notch {
+      display: none !important;
+    }
+
+    /* Laser pointer simulation */
+    .laser-active {
+      cursor: crosshair;
+    }
+    .laser-dot {
+      pointer-events: none;
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle, #fcd34d 30%, rgba(212, 175, 55, 0.25) 70%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 14px #fbbf24;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body class="bg-black text-slate-100 min-h-screen flex flex-col items-center justify-center p-0 md:p-6 transition-colors duration-200">
+
+  <!-- Desktop Utility Floating Control Bar -->
+  <header class="w-full max-w-4xl mb-4 hidden md:flex items-center justify-between px-6 py-3 bg-obsidian-900/90 backdrop-blur-md rounded-2xl border border-gold-500/30 shadow-2xl text-white">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl gold-gradient-bg flex items-center justify-center shadow-lg shadow-gold-500/20 text-black font-extrabold text-base tracking-tighter">
+        SB
+      </div>
+      <div>
+        <h1 class="font-bold text-base leading-tight flex items-center gap-2">
+          <span class="gold-gradient-text font-black tracking-wide">SlideBox</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-gold-500/10 text-gold-300 border border-gold-500/30 uppercase tracking-widest font-semibold">Prestige LMS</span>
+        </h1>
+        <p class="text-xs text-neutral-400">Executive Presentation & Course Exercise Vault</p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center gap-3 text-xs">
+      <!-- Device Frame Toggle -->
+      <button id="btn-toggle-frame" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-750 transition text-neutral-300 font-medium border border-neutral-700/60">
+        <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+        </svg>
+        <span id="frame-toggle-label">Full Screen View</span>
+      </button>
+
+      <!-- Role Switcher -->
+      <div class="flex items-center bg-obsidian-950 p-1 rounded-xl border border-gold-500/30">
+        <button id="role-prof-btn" class="px-2.5 py-1 rounded-lg text-xs font-bold transition gold-gradient-bg text-black shadow">
+          👨‍🏫 Professor
+        </button>
+        <button id="role-student-btn" class="px-2.5 py-1 rounded-lg text-xs font-semibold transition text-neutral-400 hover:text-white">
+          👨‍🎓 Student
+        </button>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button id="btn-theme-toggle" class="p-2 rounded-lg bg-obsidian-800 hover:bg-obsidian-750 text-gold-400 transition border border-neutral-700/60" title="Toggle Theme">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Mobile Device Wrapper -->
+  <main id="phone-container" class="phone-container flex justify-center items-center">
+    <div id="phone-frame" class="phone-mockup bg-obsidian-950 flex flex-col select-none relative text-slate-100">
+      
+      <!-- iPhone Style Top Dynamic Notch with Gold accent -->
+      <div class="phone-notch">
+        <div class="camera-lens"></div>
+        <div class="speaker-slot"></div>
+        <div class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></div>
+      </div>
+
+      <!-- Mobile Status Bar (9:41, WiFi, 5G, Battery) -->
+      <div class="pt-2 px-7 pb-1 flex justify-between items-center text-[11px] font-semibold tracking-tight text-neutral-300 z-40">
+        <span id="current-clock">09:41</span>
+        <div class="flex items-center gap-1.5">
+          <!-- Signal icon -->
+          <svg class="w-3.5 h-3.5 text-neutral-300" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-4a1 1 0 011-1h2a1 1 0 011 1v13a1 1 0 01-1 1h-2a1 1 0 01-1-1V3z"/>
+          </svg>
+          <!-- WiFi -->
+          <svg class="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+          </svg>
+          <!-- Battery Pill -->
+          <div class="w-5 h-2.5 rounded-sm border border-neutral-300 flex items-center p-0.5">
+            <div class="h-full bg-gold-400 rounded-2xs w-4"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Top App Bar -->
+      <div class="px-5 py-2.5 flex items-center justify-between border-b border-gold-500/20 bg-obsidian-900/80 backdrop-blur-md z-30">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl gold-gradient-bg flex items-center justify-center text-black font-black text-xs shadow-md shadow-gold-500/20">
+            SB
+          </div>
+          <div>
+            <h2 class="text-sm font-black gold-gradient-text tracking-wide leading-tight">SlideBox</h2>
+            <span id="role-badge" class="text-[9px] font-bold tracking-wider text-gold-400 uppercase">Professor Mode</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Quick Search Icon -->
+          <button id="top-search-btn" class="p-1.5 rounded-xl hover:bg-obsidian-800 text-neutral-400 hover:text-gold-300 transition border border-neutral-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </button>
+          
+          <!-- Cloud Storage Badge -->
+          <div id="storage-pill" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-obsidian-850 border border-gold-500/30 text-[10px] font-semibold text-gold-300">
+            <span class="w-2 h-2 rounded-full bg-gold-400 shadow-sm shadow-gold-400"></span>
+            <span id="header-storage-pct">8% used</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE SCREEN CONTENT AREA -->
+      <div id="screen-container" class="flex-1 overflow-y-auto no-scrollbar relative bg-obsidian-950 pb-24">
+        
+        <!-- ============================================== -->
+        <!-- VIEW 1: HOME & COURSES DASHBOARD               -->
+        <!-- ============================================== -->
+        <section id="view-home" class="view-panel p-4 space-y-4">
+          
+          <!-- Luxury Gold & Obsidian Vault Meter Card -->
+          <div class="gold-gradient-card rounded-2xl p-4 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-gold-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded-lg bg-gold-500/20 text-gold-300 border border-gold-500/30">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                </div>
+                <span class="text-xs font-bold text-gold-300 uppercase tracking-widest text-[10px]">Cloud Slide Vault</span>
+              </div>
+              <button onclick="switchTab('upload')" class="text-[11px] font-bold text-gold-400 hover:text-gold-200 flex items-center gap-1 transition">
+                + Deposit <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+
+            <!-- Storage Progress Meter -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-xs">
+                <span class="font-black text-white text-sm" id="home-storage-used">8.2 MB</span>
+                <span class="text-neutral-400 text-[11px]" id="home-storage-total">of 100 MB Quota</span>
+              </div>
+              <div class="w-full bg-obsidian-900 rounded-full h-2.5 overflow-hidden p-0.5 border border-gold-500/30">
+                <div id="home-storage-bar" class="gold-gradient-bg h-full rounded-full transition-all duration-500 shadow-sm" style="width: 8%;"></div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-neutral-400 pt-1">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gold-400"></span> <span id="home-pres-count" class="text-neutral-200 font-bold">3</span> Slide Decks</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neutral-400"></span> <span id="home-ex-count" class="text-neutral-200 font-bold">3</span> Exercises</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-600"></span> <span id="home-sub-count" class="text-neutral-200 font-bold">2</span> Submissions</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons (Gold Metallic Touch) -->
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="openUploadTab('presentation')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-obsidian-900 border border-neutral-800 hover:border-gold-500/60 shadow-sm transition active:scale-95">
+              <div class="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-400 flex items-center justify-center mb-1.5 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-bold text-neutral-300">Upload PPT</span>
+            </button>
+
+            <button onclick="openUploadTab('exercise')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-obsidian-900 border border-neutral-800 hover:border-gold-500/60 shadow-sm transition active:scale-95">
+              <div class="w-10 h-10 rounded-xl bg-obsidian-800 border border-neutral-700 text-neutral-300 flex items-center justify-center mb-1.5 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-bold text-neutral-300">Add Exercise</span>
+            </button>
+
+            <button onclick="switchTab('exercises')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-obsidian-900 border border-neutral-800 hover:border-gold-500/60 shadow-sm transition active:scale-95">
+              <div class="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-400 flex items-center justify-center mb-1.5 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-bold text-neutral-300">Take Quiz</span>
+            </button>
+
+            <button onclick="switchTab('vault')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-obsidian-900 border border-neutral-800 hover:border-gold-500/60 shadow-sm transition active:scale-95">
+              <div class="w-10 h-10 rounded-xl bg-obsidian-800 border border-neutral-700 text-neutral-300 flex items-center justify-center mb-1.5 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-bold text-neutral-300">Analytics</span>
+            </button>
+          </div>
+
+          <!-- Courses Horizontal Scroll List -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[11px] font-black text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-1.5 h-3 rounded-full bg-gold-400"></span>
+                Executive Courses
+              </h3>
+              <button onclick="openNewCourseModal()" class="text-[11px] font-bold text-gold-400 hover:text-gold-300 transition">
+                + Add Course
+              </button>
+            </div>
+            <div id="home-courses-list" class="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+              <!-- Dynamically populated course cards -->
+            </div>
+          </div>
+
+          <!-- Recent Presentations Carousel -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[11px] font-black text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-1.5 h-3 rounded-full bg-gold-400"></span>
+                Recent Presentations
+              </h3>
+              <button onclick="switchTab('presentations')" class="text-[11px] font-bold text-gold-400 hover:text-gold-300 transition">
+                View All
+              </button>
+            </div>
+            <div id="home-presentations-carousel" class="space-y-2.5">
+              <!-- Dynamically populated recent slide cards -->
+            </div>
+          </div>
+
+          <!-- Pending Exercises -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-[11px] font-black text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="w-1.5 h-3 rounded-full bg-gold-400"></span>
+                Active Exercises & Quizzes
+              </h3>
+              <button onclick="switchTab('exercises')" class="text-[11px] font-bold text-gold-400 hover:text-gold-300 transition">
+                Open Hub
+              </button>
+            </div>
+            <div id="home-exercises-list" class="space-y-2">
+              <!-- Dynamically populated pending exercises -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW 2: PRESENTATION VAULT (PPT STORAGE)        -->
+        <!-- ============================================== -->
+        <section id="view-presentations" class="view-panel p-4 space-y-3 hidden">
+          <!-- Search & Filter Controls -->
+          <div class="space-y-2">
+            <div class="relative">
+              <input id="pres-search-input" type="text" placeholder="Search slides by title, keyword, course..." 
+                class="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-obsidian-900 border border-neutral-800 focus:outline-none focus:ring-1 focus:ring-gold-500 shadow-sm text-white placeholder-neutral-500">
+              <svg class="w-4 h-4 text-neutral-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-[11px]">
+              <button onclick="filterPresentations('all')" id="filter-pres-all" class="filter-pres-chip px-3 py-1 rounded-full font-bold gold-gradient-bg text-black shadow-sm shrink-0">
+                All Decks
+              </button>
+              <button onclick="filterPresentations('fav')" id="filter-pres-fav" class="filter-pres-chip px-3 py-1 rounded-full font-medium bg-obsidian-900 text-neutral-300 border border-neutral-800 shrink-0 flex items-center gap-1">
+                ⭐ Favorites
+              </button>
+              <button onclick="filterPresentations('pptx')" id="filter-pres-pptx" class="filter-pres-chip px-3 py-1 rounded-full font-medium bg-obsidian-900 text-neutral-300 border border-neutral-800 shrink-0">
+                PowerPoint (.pptx)
+              </button>
+              <button onclick="filterPresentations('pdf')" id="filter-pres-pdf" class="filter-pres-chip px-3 py-1 rounded-full font-medium bg-obsidian-900 text-neutral-300 border border-neutral-800 shrink-0">
+                PDF Decks
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Prompt Card -->
+          <div class="p-3 rounded-xl border border-dashed border-gold-500/40 bg-gold-500/5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg gold-gradient-bg text-black flex items-center justify-center font-black text-xs shadow">
+                PPT
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-white">Deposit New Presentation</h4>
+                <p class="text-[10px] text-neutral-400">Store PPT, PPTX or PDF slides in SlideBox</p>
+              </div>
+            </div>
+            <button onclick="openUploadTab('presentation')" class="px-3 py-1.5 rounded-lg gold-gradient-bg text-black text-[11px] font-black shadow transition active:scale-95">
+              Deposit
+            </button>
+          </div>
+
+          <!-- Presentations Grid / Cards -->
+          <div id="presentations-list-container" class="space-y-3">
+            <!-- Dynamically populated presentation cards -->
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW 3: UPLOAD STUDIO (PPT & EXERCISE)          -->
+        <!-- ============================================== -->
+        <section id="view-upload" class="view-panel p-4 space-y-4 hidden">
+          <!-- Segmented Tab: Presentation vs Exercise -->
+          <div class="bg-obsidian-900 p-1 rounded-xl flex border border-neutral-800">
+            <button id="upload-mode-pres" onclick="setUploadMode('presentation')" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition gold-gradient-bg text-black shadow">
+              📑 Presentation (PPT)
+            </button>
+            <button id="upload-mode-ex" onclick="setUploadMode('exercise')" class="flex-1 py-1.5 text-xs font-bold rounded-lg transition text-neutral-400 hover:text-white">
+              📝 Exercise / Quiz
+            </button>
+          </div>
+
+          <!-- FORM: PPT UPLOAD -->
+          <form id="form-upload-presentation" class="space-y-3.5">
+            <!-- Drag & Drop Zone -->
+            <div id="ppt-dropzone" class="border-2 border-dashed border-neutral-700 hover:border-gold-500 rounded-2xl p-5 text-center bg-obsidian-900/80 transition cursor-pointer flex flex-col items-center justify-center">
+              <input type="file" id="ppt-file-input" accept=".pptx,.ppt,.pdf,.odp,.key" class="hidden">
+              <div class="w-12 h-12 rounded-2xl bg-gold-500/10 border border-gold-500/30 text-gold-400 flex items-center justify-center mb-2 shadow-inner">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+              </div>
+              <p class="text-xs font-bold text-white" id="ppt-drop-text">Tap or Drag PPT / PPTX file here</p>
+              <p class="text-[10px] text-neutral-400 mt-0.5">Supports .pptx, .ppt, .pdf up to 50MB</p>
+              <div id="ppt-file-badge" class="mt-2 hidden px-2.5 py-1 rounded-lg bg-gold-500/20 text-gold-300 border border-gold-500/40 text-[11px] font-semibold items-center gap-1.5">
+                <span id="ppt-file-name">filename.pptx</span>
+                <span id="ppt-file-size" class="text-[9px] opacity-75">(0 KB)</span>
+              </div>
+            </div>
+
+            <!-- Course Selector -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Course / Executive Module</label>
+              <select id="ppt-course-select" required class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+                <!-- Courses injected via JS -->
+              </select>
+            </div>
+
+            <!-- Lecture Title -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Presentation / Lecture Title</label>
+              <input id="ppt-title-input" type="text" placeholder="e.g. Executive Strategy: Neural Transformers" required
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+            </div>
+
+            <!-- Week Number & Tags -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold text-gold-300">Module / Week #</label>
+                <input id="ppt-week-input" type="number" min="1" max="52" value="1"
+                  class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold text-gold-300">Slide Type</label>
+                <select id="ppt-type-input" class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+                  <option value="lecture">Masterclass Lecture</option>
+                  <option value="seminar">Executive Briefing</option>
+                  <option value="lab">Technical Lab Deck</option>
+                  <option value="review">Board Review Deck</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Description / Syllabus Notes -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Lecture Summary & Key Takeaways</label>
+              <textarea id="ppt-desc-input" rows="2" placeholder="Executive outline of concepts covered in this deck..."
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500"></textarea>
+            </div>
+
+            <!-- Upload Progress bar -->
+            <div id="ppt-upload-progress-box" class="hidden space-y-1">
+              <div class="flex justify-between text-[11px] font-medium text-neutral-300">
+                <span id="ppt-upload-status-text">Storing presentation in SlideBox...</span>
+                <span id="ppt-upload-pct">0%</span>
+              </div>
+              <div class="w-full bg-obsidian-800 rounded-full h-2 overflow-hidden border border-gold-500/20">
+                <div id="ppt-progress-bar" class="gold-gradient-bg h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="ppt-submit-btn" class="w-full py-2.5 rounded-xl gold-gradient-bg text-black font-extrabold text-xs shadow-lg shadow-gold-500/20 flex items-center justify-center gap-1.5 transition active:scale-98">
+              <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+              </svg>
+              Deposit & Generate Slide Reader
+            </button>
+          </form>
+
+          <!-- FORM: EXERCISE UPLOAD -->
+          <form id="form-upload-exercise" class="space-y-3.5 hidden">
+            <!-- Exercise Document / File Dropzone -->
+            <div id="ex-dropzone" class="border-2 border-dashed border-neutral-700 hover:border-gold-500 rounded-2xl p-5 text-center bg-obsidian-900/80 transition cursor-pointer flex flex-col items-center justify-center">
+              <input type="file" id="ex-file-input" accept=".pdf,.docx,.zip,.txt,.ipynb,.pptx" class="hidden">
+              <div class="w-12 h-12 rounded-2xl bg-obsidian-800 border border-neutral-700 text-gold-400 flex items-center justify-center mb-2 shadow-inner">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p class="text-xs font-bold text-white" id="ex-drop-text">Attach Worksheet / Exercise Document</p>
+              <p class="text-[10px] text-neutral-400 mt-0.5">PDF, DOCX, ZIP, Jupyter Notebook</p>
+              <div id="ex-file-badge" class="mt-2 hidden px-2.5 py-1 rounded-lg bg-gold-500/20 text-gold-300 border border-gold-500/40 text-[11px] font-semibold items-center gap-1.5">
+                <span id="ex-file-name">exercise.pdf</span>
+                <span id="ex-file-size" class="text-[9px] opacity-75">(0 KB)</span>
+              </div>
+            </div>
+
+            <!-- Course Selector -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Course</label>
+              <select id="ex-course-select" required class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+                <!-- Courses injected via JS -->
+              </select>
+            </div>
+
+            <!-- Link to Presentation -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300 flex items-center justify-between">
+                <span>Link to Presentation Deck</span>
+                <span class="text-[10px] text-gold-400">Recommended</span>
+              </label>
+              <select id="ex-presentation-select" class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+                <option value="">-- Standalone Exercise --</option>
+                <!-- Presentations injected via JS -->
+              </select>
+            </div>
+
+            <!-- Exercise Title -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Exercise Title</label>
+              <input id="ex-title-input" type="text" placeholder="e.g. Case Study: Scalable Ingestion Pipeline" required
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+            </div>
+
+            <!-- Exercise Type & Max Points -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold text-gold-300">Exercise Format</label>
+                <select id="ex-type-input" class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+                  <option value="quiz">Interactive Quiz (Auto-graded)</option>
+                  <option value="assignment">Executive Assignment</option>
+                  <option value="coding">Technical Lab Challenge</option>
+                  <option value="case_study">Case Study Analysis</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold text-gold-300">Max Points</label>
+                <input id="ex-points-input" type="number" min="10" max="1000" value="100"
+                  class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+              </div>
+            </div>
+
+            <!-- Due Date -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Deadline</label>
+              <input id="ex-due-input" type="datetime-local"
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500">
+            </div>
+
+            <!-- Instructions & Rubric -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Instructions & Rubric</label>
+              <textarea id="ex-desc-input" rows="2" placeholder="Executive deliverables and evaluation standards..."
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-900 border border-neutral-800 text-white focus:ring-1 focus:ring-gold-500"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="ex-submit-btn" class="w-full py-2.5 rounded-xl gold-gradient-bg text-black font-extrabold text-xs shadow-lg shadow-gold-500/20 flex items-center justify-center gap-1.5 transition active:scale-98">
+              <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Publish Exercise to SlideBox
+            </button>
+          </form>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW 4: EXERCISES & QUIZZES HUB                -->
+        <!-- ============================================== -->
+        <section id="view-exercises" class="view-panel p-4 space-y-3 hidden">
+          <!-- Filter Tabs -->
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-[11px]">
+            <button onclick="filterExercises('all')" id="filter-ex-all" class="filter-ex-chip px-3 py-1 rounded-full font-bold gold-gradient-bg text-black shadow-sm shrink-0">
+              All Tasks
+            </button>
+            <button onclick="filterExercises('quiz')" id="filter-ex-quiz" class="filter-ex-chip px-3 py-1 rounded-full font-medium bg-obsidian-900 text-neutral-300 border border-neutral-800 shrink-0 flex items-center gap-1">
+              ⚡ Quizzes
+            </button>
+            <button onclick="filterExercises('assignment')" id="filter-ex-assign" class="filter-ex-chip px-3 py-1 rounded-full font-medium bg-obsidian-900 text-neutral-300 border border-neutral-800 shrink-0">
+              📑 Assignments
+            </button>
+            <button onclick="filterExercises('coding')" id="filter-ex-coding" class="filter-ex-chip px-3 py-1 rounded-full font-medium bg-obsidian-900 text-neutral-300 border border-neutral-800 shrink-0">
+              💻 Technical Labs
+            </button>
+          </div>
+
+          <!-- Exercises List Container -->
+          <div id="exercises-list-container" class="space-y-3">
+            <!-- Dynamically populated exercise cards -->
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VIEW 5: VAULT ANALYTICS & ACTIVITY LOGS         -->
+        <!-- ============================================== -->
+        <section id="view-vault" class="view-panel p-4 space-y-4 hidden">
+          <!-- Storage Analytics Detailed Card -->
+          <div class="gold-gradient-card rounded-2xl p-4 shadow-xl space-y-3">
+            <h3 class="text-xs font-black gold-gradient-text uppercase tracking-widest flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              SlideBox Storage Metrics
+            </h3>
+
+            <!-- Progress Meter -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="font-black text-white" id="vault-used-txt">8.2 MB Used</span>
+                <span class="text-neutral-400">100 MB Limit</span>
+              </div>
+              <div class="w-full bg-obsidian-900 rounded-full h-3 overflow-hidden flex border border-gold-500/30">
+                <div id="vault-bar-pres" class="gold-gradient-bg h-full" style="width: 60%"></div>
+                <div id="vault-bar-ex" class="bg-neutral-600 h-full" style="width: 25%"></div>
+                <div id="vault-bar-sub" class="bg-neutral-800 h-full" style="width: 15%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-gold-400"></span> Presentations (<span id="vault-pres-mb">4.8 MB</span>)</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neutral-400"></span> Exercises (<span id="vault-ex-mb">2.1 MB</span>)</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-neutral-600"></span> Submissions (<span id="vault-sub-mb">1.3 MB</span>)</span>
+              </div>
+            </div>
+
+            <!-- Stats 2x2 Grid -->
+            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-800">
+              <div class="p-2.5 rounded-xl bg-obsidian-900 border border-neutral-800">
+                <div class="text-[10px] text-neutral-400">Total Presentations</div>
+                <div class="text-base font-bold gold-gradient-text" id="vault-pres-count">3 Files</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-obsidian-900 border border-neutral-800">
+                <div class="text-[10px] text-neutral-400">Course Exercises</div>
+                <div class="text-base font-bold text-white" id="vault-ex-count">3 Published</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-obsidian-900 border border-neutral-800">
+                <div class="text-[10px] text-neutral-400">Student Works</div>
+                <div class="text-base font-bold text-gold-300" id="vault-sub-count">2 Submitted</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-obsidian-900 border border-neutral-800">
+                <div class="text-[10px] text-neutral-400">Executive Courses</div>
+                <div class="text-base font-bold text-neutral-200" id="vault-course-count">4 Active</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submissions Review (For Instructors) -->
+          <div class="bg-obsidian-900 rounded-2xl p-4 border border-neutral-800 shadow-sm space-y-2">
+            <h3 class="text-xs font-black gold-gradient-text uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Student Submissions & Evaluation
+            </h3>
+            <div id="vault-submissions-list" class="space-y-2">
+              <!-- Dynamically populated submissions -->
+            </div>
+          </div>
+
+          <!-- Activity Audit Log -->
+          <div class="bg-obsidian-900 rounded-2xl p-4 border border-neutral-800 shadow-sm space-y-2">
+            <h3 class="text-xs font-black text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Recent Vault Activity
+            </h3>
+            <div id="vault-activities-list" class="space-y-2 text-xs">
+              <!-- Dynamically populated activity logs -->
+            </div>
+          </div>
+
+          <!-- Data Controls -->
+          <div class="pt-1 text-center">
+            <button onclick="resetAndReseedData()" class="text-xs text-neutral-500 hover:text-gold-400 font-medium underline transition">
+              Reset & Re-seed Sample LMS Content
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- BOTTOM APP NAVIGATION BAR (MOBILE)             -->
+      <!-- ============================================== -->
+      <nav class="absolute bottom-0 left-0 right-0 h-16 glass-nav px-3 flex items-center justify-around z-40">
+        <!-- Tab 1: Home -->
+        <button onclick="switchTab('home')" id="nav-btn-home" class="nav-btn flex flex-col items-center justify-center w-14 py-1 text-gold-400 font-bold">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="text-[10px]">Home</span>
+        </button>
+
+        <!-- Tab 2: Presentations -->
+        <button onclick="switchTab('presentations')" id="nav-btn-presentations" class="nav-btn flex flex-col items-center justify-center w-14 py-1 text-neutral-500 hover:text-neutral-300">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+          </svg>
+          <span class="text-[10px] font-semibold">Slides</span>
+        </button>
+
+        <!-- Center Action Button: Deposit / Upload -->
+        <button onclick="switchTab('upload')" id="nav-btn-upload" class="flex flex-col items-center justify-center -mt-5">
+          <div class="w-12 h-12 rounded-full gold-gradient-bg text-black flex items-center justify-center shadow-lg shadow-gold-500/40 hover:scale-105 active:scale-95 transition">
+            <svg class="w-6 h-6 stroke-black" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </div>
+          <span class="text-[9px] font-bold text-gold-400 mt-0.5">Deposit</span>
+        </button>
+
+        <!-- Tab 4: Exercises -->
+        <button onclick="switchTab('exercises')" id="nav-btn-exercises" class="nav-btn flex flex-col items-center justify-center w-14 py-1 text-neutral-500 hover:text-neutral-300">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+          </svg>
+          <span class="text-[10px] font-semibold">Exercises</span>
+        </button>
+
+        <!-- Tab 5: Vault Analytics -->
+        <button onclick="switchTab('vault')" id="nav-btn-vault" class="nav-btn flex flex-col items-center justify-center w-14 py-1 text-neutral-500 hover:text-neutral-300">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          <span class="text-[10px] font-semibold">Vault</span>
+        </button>
+      </nav>
+
+      <!-- Bottom Home Indicator Bar -->
+      <div class="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-neutral-700 rounded-full z-50 pointer-events-none"></div>
+
+      <!-- ============================================== -->
+      <!-- MODAL 1: INTERACTIVE SLIDE DECK VIEWER          -->
+      <!-- ============================================== -->
+      <div id="modal-slide-player" class="fixed inset-0 bg-black/95 backdrop-blur-md z-50 hidden flex flex-col text-white transition-opacity duration-300">
+        <!-- Slide Top Bar -->
+        <div class="px-4 py-3 flex items-center justify-between border-b border-gold-500/20 bg-obsidian-900/90">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <button onclick="closeSlidePlayer()" class="p-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-750 text-neutral-300 border border-neutral-700">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <div class="truncate">
+              <h3 id="player-pres-title" class="text-xs font-black gold-gradient-text truncate">Lecture Title</h3>
+              <p id="player-pres-course" class="text-[10px] text-neutral-400 truncate">Course Code</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Laser pointer toggle -->
+            <button id="btn-toggle-laser" onclick="toggleLaserPointer()" class="p-1.5 rounded-lg bg-obsidian-800 hover:bg-obsidian-750 text-gold-400 border border-neutral-700" title="Laser Pointer">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="6"/>
+              </svg>
+            </button>
+            <!-- Download original PPT -->
+            <button id="player-btn-download" class="p-1.5 rounded-lg gold-gradient-bg text-black font-bold" title="Download PPTX">
+              <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Slide Canvas (The Presentation Card) -->
+        <div class="flex-1 p-4 flex flex-col justify-center items-center overflow-y-auto no-scrollbar relative" id="slide-stage">
+          <div id="slide-card" class="slide-card w-full max-w-sm gold-gradient-card rounded-2xl p-5 flex flex-col justify-between min-h-[360px] relative overflow-hidden shadow-2xl">
+            <!-- Background gold sheen -->
+            <div class="absolute -top-10 -right-10 w-44 h-44 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Slide Header -->
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span id="slide-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gold-500/20 text-gold-300 border border-gold-500/40 uppercase tracking-wider">
+                  Concept
+                </span>
+                <span id="slide-counter-badge" class="text-xs font-mono text-neutral-400">
+                  Slide 1 / 6
+                </span>
+              </div>
+              
+              <h2 id="slide-title" class="text-lg font-black text-white leading-tight mb-1">
+                Slide Title Goes Here
+              </h2>
+              <p id="slide-subtitle" class="text-xs text-gold-200/80 mb-4 font-semibold">
+                Detailed slide subtitle
+              </p>
+
+              <!-- Bullets List -->
+              <ul id="slide-bullets" class="space-y-2 text-xs text-neutral-200">
+                <!-- Bullets injected dynamically -->
+              </ul>
+            </div>
+
+            <!-- Speaker Notes Drawer -->
+            <div class="mt-4 pt-3 border-t border-gold-500/20">
+              <div class="flex items-center gap-1.5 text-[10px] font-bold text-gold-400 mb-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+                Instructor Notes & Executive Remarks:
+              </div>
+              <p id="slide-notes" class="text-[11px] text-neutral-300 italic">
+                Notes for this slide...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide Player Bottom Controller -->
+        <div class="px-4 py-3 bg-obsidian-900 border-t border-neutral-800 flex items-center justify-between">
+          <button onclick="prevSlide()" class="px-3.5 py-1.5 rounded-xl bg-obsidian-800 hover:bg-obsidian-750 text-xs font-bold flex items-center gap-1 text-white border border-neutral-700 active:scale-95 transition">
+            &larr; Prev
+          </button>
+
+          <!-- Thumbnails Scrubber -->
+          <div id="slide-thumbnails-bar" class="flex gap-1.5 overflow-x-auto no-scrollbar max-w-[180px] py-1">
+            <!-- Slide dots injected here -->
+          </div>
+
+          <button onclick="nextSlide()" class="px-3.5 py-1.5 rounded-xl gold-gradient-bg text-black text-xs font-black flex items-center gap-1 shadow active:scale-95 transition">
+            Next &rarr;
+          </button>
+        </div>
+
+        <!-- Quick Jump to Linked Exercise button -->
+        <div id="player-linked-ex-box" class="px-4 py-2 bg-obsidian-950 border-t border-gold-500/20 flex items-center justify-between">
+          <span class="text-[11px] text-neutral-300">Executive exercises linked to this deck:</span>
+          <button onclick="jumpToLinkedExerciseFromPlayer()" class="text-xs font-bold text-gold-400 hover:text-gold-200 flex items-center gap-1">
+            Open Exercise &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- MODAL 2: INTERACTIVE QUIZ PLAYER               -->
+      <!-- ============================================== -->
+      <div id="modal-quiz" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col text-slate-100 p-4">
+        <div class="w-full max-w-sm mx-auto my-auto bg-obsidian-900 rounded-3xl p-5 border border-gold-500/30 shadow-2xl flex flex-col space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gold-400" id="quiz-course-code">CS 301</span>
+              <h3 class="text-sm font-bold text-white" id="quiz-modal-title">Interactive Quiz</h3>
+            </div>
+            <button onclick="closeQuizModal()" class="p-1 rounded-full text-neutral-400 hover:text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px] text-neutral-400">
+              <span id="quiz-progress-text">Question 1 of 4</span>
+              <span id="quiz-score-badge" class="text-gold-400 font-bold">Score: 0 pts</span>
+            </div>
+            <div class="w-full bg-obsidian-800 rounded-full h-1.5 overflow-hidden border border-neutral-700">
+              <div id="quiz-progress-bar" class="gold-gradient-bg h-full rounded-full transition-all" style="width: 25%"></div>
+            </div>
+          </div>
+
+          <!-- Question Box -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold text-white leading-snug" id="quiz-question-text">
+              Question text here?
+            </h4>
+            
+            <!-- Options -->
+            <div id="quiz-options-container" class="space-y-2">
+              <!-- Options injected -->
+            </div>
+
+            <!-- Explanation box (hidden until answered) -->
+            <div id="quiz-explanation-box" class="p-3 rounded-xl bg-obsidian-850 border border-gold-500/30 hidden space-y-1">
+              <span class="text-[10px] font-bold text-gold-400">Analysis:</span>
+              <p class="text-[11px] text-neutral-300" id="quiz-explanation-text"></p>
+            </div>
+          </div>
+
+          <!-- Quiz Action / Next Button -->
+          <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="w-full py-2.5 rounded-xl gold-gradient-bg text-black font-extrabold text-xs shadow active:scale-98 transition">
+            Next Question &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- MODAL 3: EXERCISE SUBMISSION (ASSIGNMENT/LAB)   -->
+      <!-- ============================================== -->
+      <div id="modal-submission" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex flex-col p-4">
+        <div class="w-full max-w-sm mx-auto my-auto bg-obsidian-900 rounded-3xl p-5 border border-gold-500/30 shadow-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold text-gold-400 uppercase tracking-widest">Deliverable Submission</span>
+              <h3 class="text-sm font-bold text-white" id="sub-modal-title">Exercise Title</h3>
+            </div>
+            <button onclick="closeSubmissionModal()" class="p-1 rounded-full text-neutral-400 hover:text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <form id="form-submit-work" class="space-y-3">
+            <input type="hidden" id="sub-exercise-id">
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Student Name</label>
+              <input type="text" id="sub-student-name" value="Alex Rivera" required
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">ID / Matriculation</label>
+              <input type="text" id="sub-student-id" value="STU-9842" required
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white">
+            </div>
+
+            <!-- File Upload -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Upload Solution Document</label>
+              <input type="file" id="sub-file-input" class="w-full text-xs p-1 text-neutral-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:gold-gradient-bg file:text-black">
+            </div>
+
+            <!-- Notes -->
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Executive Summary / Solution Remarks</label>
+              <textarea id="sub-notes-input" rows="3" placeholder="Paste explanation, repository link, or notes..."
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl gold-gradient-bg text-black font-extrabold text-xs shadow transition active:scale-98">
+              Submit Deliverable to SlideBox
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- MODAL 4: ADD NEW COURSE                        -->
+      <!-- ============================================== -->
+      <div id="modal-new-course" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex flex-col p-4">
+        <div class="w-full max-w-sm mx-auto my-auto bg-obsidian-900 rounded-3xl p-5 border border-gold-500/30 shadow-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Add Executive Course</h3>
+            <button onclick="closeNewCourseModal()" class="p-1 rounded-full text-neutral-400 hover:text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <form id="form-new-course" class="space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold text-gold-300">Code</label>
+                <input type="text" id="course-code-input" placeholder="e.g. CS 450" required
+                  class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold text-gold-300">Term</label>
+                <input type="text" id="course-term-input" value="Fall 2026"
+                  class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white">
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Course Title</label>
+              <input type="text" id="course-title-input" placeholder="e.g. Quantum Computing & Cryptography" required
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Instructor Name</label>
+              <input type="text" id="course-instructor-input" placeholder="e.g. Prof. Alan Turing"
+                class="w-full text-xs px-3 py-2 rounded-xl bg-obsidian-800 border border-neutral-700 text-white">
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-gold-300">Accent Tone</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="course-color-input" value="#d4af37" class="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0">
+                <span class="text-xs text-neutral-400">Select gold / metallic accent</span>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl gold-gradient-bg text-black font-extrabold text-xs shadow active:scale-98 transition">
+              Create Course
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- PWA & Application Script -->
+  <script src="/auth.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
