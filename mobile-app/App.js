@@ -85,8 +85,8 @@ function TabNavigator() {
         name="Upload"
         component={UploadScreen}
         options={{
-          title: 'Deposit Content',
-          tabBarLabel: 'Deposit',
+          title: 'Upload Content',
+          tabBarLabel: 'Upload',
           tabBarIcon: () => (
             <View style={styles.uploadTabIcon}>
               <Text style={{ color: '#000', fontSize: 20, fontWeight: '900' }}>+</Text>

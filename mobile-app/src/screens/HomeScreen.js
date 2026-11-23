@@ -64,7 +64,7 @@ export default function HomeScreen({ navigation }) {
               style={styles.heroUploadBtn}
               onPress={() => navigation.navigate('Upload')}
             >
-              <Text style={styles.heroUploadText}>+ Deposit</Text>
+              <Text style={styles.heroUploadText}>+ Upload</Text>
             </TouchableOpacity>
           ) : (
             <Text style={styles.heroSub}>{(user?.name || '').toUpperCase()}</Text>

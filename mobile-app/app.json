@@ -33,6 +33,12 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c634cd5b-8723-4c1d-9b21-5e505d8c2e4b"
+      }
+    },
+    "owner": "ngcl29"
   }
 }

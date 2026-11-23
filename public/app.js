@@ -259,7 +259,7 @@ function renderHome() {
   if (presCarousel) {
     const recent = state.presentations.slice(0, 3);
     if (recent.length === 0) {
-      presCarousel.innerHTML = `<p class="text-xs text-neutral-500 italic py-2">No presentations deposited yet.</p>`;
+      presCarousel.innerHTML = `<p class="text-xs text-neutral-500 italic py-2">No presentations uploaded yet.</p>`;
     } else {
       presCarousel.innerHTML = recent.map(p => `
         <div class="p-3 rounded-2xl bg-obsidian-900 border border-neutral-800 hover:border-gold-500/40 shadow-sm flex items-center justify-between transition">
@@ -347,7 +347,7 @@ function renderPresentations() {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
         </svg>
         <p class="text-xs font-medium text-neutral-400">No presentations match your criteria.</p>
-        <button onclick="openUploadTab('presentation')" class="mt-2 text-xs font-bold text-gold-400 underline">Deposit your first PPT deck</button>
+        <button onclick="openUploadTab('presentation')" class="mt-2 text-xs font-bold text-gold-400 underline">Upload your first PPT deck</button>
       </div>
     `;
     return;
@@ -678,7 +678,7 @@ function showPptFileSelected(file) {
     badge.classList.add('flex');
     nameEl.textContent = file.name;
     sizeEl.textContent = `(${(file.size / 1024).toFixed(0)} KB)`;
-    dropText.textContent = 'Presentation selected: Ready to deposit';
+    dropText.textContent = 'Presentation selected: Ready to upload';
   }
 
   const titleInput = document.getElementById('ppt-title-input');
@@ -779,7 +779,7 @@ async function handlePptSubmit(e) {
     clearInterval(interval);
     progressBox.classList.add('hidden');
     submitBtn.disabled = false;
-    alert(`Deposit failed: ${err.message}`);
+    alert(`Upload failed: ${err.message}`);
   }
 }
 

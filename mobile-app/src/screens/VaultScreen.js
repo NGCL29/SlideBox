@@ -44,7 +44,7 @@ export default function VaultScreen({ navigation }) {
       {/* Storage Card */}
       <View style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={styles.usedText}>{usedMb} MB Deposited</Text>
+          <Text style={styles.usedText}>{usedMb} MB Uploaded</Text>
           <Text style={styles.limitText}>of {quotaMb} MB Quota</Text>
         </View>
 

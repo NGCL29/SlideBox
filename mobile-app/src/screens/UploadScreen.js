@@ -89,7 +89,7 @@ export default function UploadScreen({ navigation }) {
           description
         });
 
-        Alert.alert('Deposit Complete', `"${res.title || title}" has been stored in SlideBox.`, [
+        Alert.alert('Upload Complete', `"${res.title || title}" has been stored in SlideBox.`, [
           { text: 'OK', onPress: () => navigation.navigate('Slides') }
         ]);
       } else {
@@ -112,7 +112,7 @@ export default function UploadScreen({ navigation }) {
       setTitle('');
       setDescription('');
     } catch (err) {
-      Alert.alert('Deposit Error', err.message);
+      Alert.alert('Upload Error', err.message);
     } finally {
       setUploading(false);
     }
@@ -127,7 +127,7 @@ export default function UploadScreen({ navigation }) {
           onPress={() => { setMode('presentation'); setPickedFile(null); }}
         >
           <Text style={[styles.modeText, mode === 'presentation' && styles.modeTextActive]}>
-            📑 Deposit PPT Slide
+            📑 Upload PPT Slide
           </Text>
         </TouchableOpacity>
 
@@ -151,7 +151,7 @@ export default function UploadScreen({ navigation }) {
         </Text>
         <Text style={styles.pickerSub}>
           {pickedFile
-            ? `${(pickedFile.size / 1024).toFixed(0)} KB • Ready for SlideBox deposit`
+            ? `${(pickedFile.size / 1024).toFixed(0)} KB • Ready for SlideBox upload`
             : 'Access native files from iCloud / Device Storage'}
         </Text>
       </TouchableOpacity>
@@ -266,7 +266,7 @@ export default function UploadScreen({ navigation }) {
           <ActivityIndicator color="#000" />
         ) : (
           <Text style={styles.submitBtnText}>
-            {mode === 'presentation' ? '👑 Deposit PPT in SlideBox' : '🚀 Publish Exercise to SlideBox'}
+            {mode === 'presentation' ? '👑 Upload PPT in SlideBox' : '🚀 Publish Exercise to SlideBox'}
           </Text>
         )}
       </TouchableOpacity>
